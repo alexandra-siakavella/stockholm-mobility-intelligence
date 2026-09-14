@@ -1,0 +1,17 @@
+pandas
+numpy
+requests
+pydantic
+python-dotenv
+
+pyarrow
+pyspark
+
+scikit-learn
+xgboost
+
+sqlalchemy
+psycopg2-binary
+
+pytest
+ruff
