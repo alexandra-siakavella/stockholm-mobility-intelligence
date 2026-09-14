@@ -5,16 +5,17 @@ Data-quality checks for SL transport site data.
 from typing import Any
 
 
-def validate_sites(sites: list[dict[str, Any]]) -> None:
+def validate_sites(
+    sites: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
     """
-    Validate the structure and basic values of SL transport sites.
+    Validate SL transport sites and return invalid records.
 
-    Raises:
-        ValueError: If any data-quality rule fails.
+    Records with missing or invalid coordinates are flagged rather
+    than causing the entire ingestion pipeline to fail.
     """
 
-    if not sites:
-        raise ValueError("No transport sites were returned.")
+    invalid_sites = []
 
     required_fields = {"id", "name", "lat", "lon"}
 
@@ -22,29 +23,55 @@ def validate_sites(sites: list[dict[str, Any]]) -> None:
         missing_fields = required_fields - site.keys()
 
         if missing_fields:
-            raise ValueError(
-                f"Site at index {index} is missing: {missing_fields}"
+            invalid_sites.append(
+                {
+                    "index": index,
+                    "site": site,
+                    "reason": f"Missing fields: {sorted(missing_fields)}",
+                }
             )
+            continue
 
         latitude = site["lat"]
         longitude = site["lon"]
 
         if not isinstance(latitude, (int, float)):
-            raise ValueError(
-                f"Invalid latitude at index {index}: {latitude}"
+            invalid_sites.append(
+                {
+                    "index": index,
+                    "site": site,
+                    "reason": "Invalid latitude",
+                }
             )
+            continue
 
         if not isinstance(longitude, (int, float)):
-            raise ValueError(
-                f"Invalid longitude at index {index}: {longitude}"
+            invalid_sites.append(
+                {
+                    "index": index,
+                    "site": site,
+                    "reason": "Invalid longitude",
+                }
             )
+            continue
 
         if not -90 <= latitude <= 90:
-            raise ValueError(
-                f"Latitude outside valid range at index {index}: {latitude}"
+            invalid_sites.append(
+                {
+                    "index": index,
+                    "site": site,
+                    "reason": "Latitude outside valid range",
+                }
             )
+            continue
 
         if not -180 <= longitude <= 180:
-            raise ValueError(
-                f"Longitude outside valid range at index {index}: {longitude}"
+            invalid_sites.append(
+                {
+                    "index": index,
+                    "site": site,
+                    "reason": "Longitude outside valid range",
+                }
             )
+
+    return invalid_sites
