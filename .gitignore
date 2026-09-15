@@ -19,7 +19,7 @@ env/
 # Data
 data/raw/*
 data/processed/*
-
+data/quarantine/*
 # Logs
 *.log
 
