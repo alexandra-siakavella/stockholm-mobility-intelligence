@@ -12,7 +12,7 @@ env/
 .env
 .env.*
 !.env.example
-
+dbt/profiles.yml
 # Jupyter
 .ipynb_checkpoints/
 
@@ -35,3 +35,6 @@ data/quarantine/*
 
 # Ruff
 .ruff_cache/
+# dbt
+dbt/target/
+dbt/logs/

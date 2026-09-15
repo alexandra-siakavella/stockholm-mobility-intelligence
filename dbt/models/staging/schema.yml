@@ -1,0 +1,41 @@
+version: 2
+
+models:
+  - name: stg_transport_sites
+    description: "Clean staging layer for SL transport sites."
+
+    columns:
+      - name: site_id
+        description: "Unique identifier for the transport site."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: gid
+        description: "Global identifier for the transport site."
+        data_tests:
+          - not_null
+
+      - name: site_name
+        description: "Name of the transport site."
+        data_tests:
+          - not_null
+
+      - name: note
+        description: "Optional note describing the transport site."
+
+      - name: latitude
+        description: "Latitude of the transport site."
+        data_tests:
+          - not_null
+
+      - name: longitude
+        description: "Longitude of the transport site."
+        data_tests:
+          - not_null
+
+      - name: valid_from
+        description: "Timestamp from which the SL site record is valid."
+        data_tests:
+          - not_null
+          
