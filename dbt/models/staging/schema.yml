@@ -38,4 +38,43 @@ models:
         description: "Timestamp from which the SL site record is valid."
         data_tests:
           - not_null
+
+  - name: mart_line_performance
+    description: "Gold-level performance metrics aggregated by transport line and mode."
+
+    columns:
+      - name: line_designation
+        description: "Public transport line designation."
+        data_tests:
+          - not_null
+
+      - name: transport_mode
+        description: "Transport mode such as BUS, METRO, or TRAIN."
+        data_tests:
+          - not_null
+
+      - name: observation_count
+        description: "Number of departure observations included in the aggregation."
+        data_tests:
+          - not_null
+
+      - name: average_delay_seconds
+        description: "Average difference between expected and scheduled departure time in seconds."
+        data_tests:
+          - not_null
+
+      - name: maximum_delay_seconds
+        description: "Maximum observed departure delay in seconds."
+        data_tests:
+          - not_null
+
+      - name: average_minutes_until_departure
+        description: "Average number of minutes between observation and scheduled departure."
+        data_tests:
+          - not_null
+
+      - name: cancelled_observations
+        description: "Number of observations associated with cancelled journeys."
+        data_tests:
+          - not_null
           
