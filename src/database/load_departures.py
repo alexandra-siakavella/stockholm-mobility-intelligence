@@ -3,6 +3,7 @@ Load raw departure observations into PostgreSQL.
 """
 
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -14,13 +15,12 @@ RAW_DEPARTURES_DIR = Path("data/raw/departures")
 
 
 DB_CONFIG = {
-    "host": "localhost",
-    "port": 5432,
-    "dbname": "mobility",
-    "user": "mobility_user",
-    "password": "mobility_password",
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5432")),
+    "dbname": os.getenv("DB_NAME", "mobility"),
+    "user": os.getenv("DB_USER", "mobility_user"),
+    "password": os.getenv("DB_PASSWORD", "mobility_password"),
 }
-
 
 def load_raw_departures(
     file_path: Path,
