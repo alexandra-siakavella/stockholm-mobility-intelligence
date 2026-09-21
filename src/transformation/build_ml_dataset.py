@@ -8,11 +8,21 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 
+import os
+from pathlib import Path
+
+import pandas as pd
+from sqlalchemy import create_engine
+
+
 DB_URL = (
     "postgresql+psycopg2://"
-    "mobility_user:mobility_password@localhost:5432/mobility"
+    f"{os.getenv('DB_USER', 'mobility_user')}:"
+    f"{os.getenv('DB_PASSWORD', 'mobility_password')}@"
+    f"{os.getenv('DB_HOST', 'localhost')}:"
+    f"{os.getenv('DB_PORT', '5432')}/"
+    f"{os.getenv('DB_NAME', 'mobility')}"
 )
-
 OUTPUT_PATH = Path("data/processed/departure_ml_dataset.parquet")
 
 

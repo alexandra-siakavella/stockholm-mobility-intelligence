@@ -7,15 +7,22 @@ from pathlib import Path
 import pandas as pd
 
 
-INPUT_PATH = Path("data/processed/departure_ml_dataset.parquet")
-OUTPUT_DIR = Path("data/processed/ml")
+INPUT_PATH = Path(
+    "data/processed/departure_ml_dataset.parquet"
+)
+
+OUTPUT_DIR = Path(
+    "data/processed/ml"
+)
 
 
-def create_splits(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-    """Split the dataset chronologically into train, validation, and test sets."""
+def create_splits(
+    df: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """Create chronological splits without splitting journeys."""
 
     df = df.sort_values(
-        ["observed_at", "observation_id"]
+        ["observed_at", "journey_id", "observation_id"]
     ).reset_index(drop=True)
 
     n = len(df)
@@ -23,9 +30,28 @@ def create_splits(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.Data
     train_end = int(n * 0.70)
     validation_end = int(n * 0.85)
 
-    train = df.iloc[:train_end].copy()
-    validation = df.iloc[train_end:validation_end].copy()
-    test = df.iloc[validation_end:].copy()
+    train_cutoff = df.loc[
+        train_end,
+        "observed_at",
+    ]
+
+    validation_cutoff = df.loc[
+        validation_end,
+        "observed_at",
+    ]
+
+    train = df[
+        df["observed_at"] < train_cutoff
+    ].copy()
+
+    validation = df[
+        (df["observed_at"] >= train_cutoff)
+        & (df["observed_at"] < validation_cutoff)
+    ].copy()
+
+    test = df[
+        df["observed_at"] >= validation_cutoff
+    ].copy()
 
     return train, validation, test
 
@@ -76,18 +102,15 @@ def main() -> None:
     print(f"Validation rows: {len(validation)}")
     print(f"Test rows: {len(test)}")
 
-    print()
-    print("Training period:")
+    print("\nTraining period:")
     print(train["observed_at"].min())
     print(train["observed_at"].max())
 
-    print()
-    print("Validation period:")
+    print("\nValidation period:")
     print(validation["observed_at"].min())
     print(validation["observed_at"].max())
 
-    print()
-    print("Test period:")
+    print("\nTest period:")
     print(test["observed_at"].min())
     print(test["observed_at"].max())
 

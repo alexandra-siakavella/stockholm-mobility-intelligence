@@ -135,7 +135,7 @@ def save_departures(
 
 
 if __name__ == "__main__":
-    site_ids = [9001, 1002]
+    site_ids = [9001, 1002, 9115, 9189, 9117, 9208]
 
     all_departures = []
 

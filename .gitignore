@@ -20,6 +20,9 @@ dbt/profiles.yml
 data/raw/*
 data/processed/*
 data/quarantine/*
+
+# Model artifacts
+data/models/*.joblib
 # Logs
 *.log
 
