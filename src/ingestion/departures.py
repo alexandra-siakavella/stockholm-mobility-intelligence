@@ -9,6 +9,8 @@ from typing import Any
 
 import requests
 
+from src.config import SL_SITE_IDS
+
 
 BASE_URL = "https://transport.integration.sl.se/v1"
 
@@ -135,11 +137,9 @@ def save_departures(
 
 
 if __name__ == "__main__":
-    site_ids = [9001, 1002, 9115, 9189, 9117, 9208]
-
     all_departures = []
 
-    for site_id in site_ids:
+    for site_id in SL_SITE_IDS:
         departures = get_departures(site_id)
 
         all_departures.extend(

@@ -1,5 +1,5 @@
 """
-Create chronological train, validation, and test splits.
+Create journey-aware chronological train, validation, and test splits.
 """
 
 from pathlib import Path
@@ -25,32 +25,56 @@ def create_splits(
         ["observed_at", "journey_id", "observation_id"]
     ).reset_index(drop=True)
 
-    n = len(df)
+    journey_times = (
+        df.groupby("journey_id")["observed_at"]
+        .min()
+        .sort_values()
+    )
 
-    train_end = int(n * 0.70)
-    validation_end = int(n * 0.85)
+    n_journeys = len(journey_times)
 
-    train_cutoff = df.loc[
-        train_end,
-        "observed_at",
-    ]
+    train_journey_end = int(
+        n_journeys * 0.70
+    )
 
-    validation_cutoff = df.loc[
-        validation_end,
-        "observed_at",
-    ]
+    validation_journey_end = int(
+        n_journeys * 0.85
+    )
+
+    train_journeys = set(
+        journey_times.iloc[
+            :train_journey_end
+        ].index
+    )
+
+    validation_journeys = set(
+        journey_times.iloc[
+            train_journey_end:validation_journey_end
+        ].index
+    )
+
+    test_journeys = set(
+        journey_times.iloc[
+            validation_journey_end:
+        ].index
+    )
 
     train = df[
-        df["observed_at"] < train_cutoff
+        df["journey_id"].isin(
+            train_journeys
+        )
     ].copy()
 
     validation = df[
-        (df["observed_at"] >= train_cutoff)
-        & (df["observed_at"] < validation_cutoff)
+        df["journey_id"].isin(
+            validation_journeys
+        )
     ].copy()
 
     test = df[
-        df["observed_at"] >= validation_cutoff
+        df["journey_id"].isin(
+            test_journeys
+        )
     ].copy()
 
     return train, validation, test
@@ -85,11 +109,15 @@ def save_splits(
 
 
 def main() -> None:
-    """Create and save chronological dataset splits."""
+    """Create and save journey-aware chronological splits."""
 
-    df = pd.read_parquet(INPUT_PATH)
+    df = pd.read_parquet(
+        INPUT_PATH
+    )
 
-    train, validation, test = create_splits(df)
+    train, validation, test = create_splits(
+        df
+    )
 
     save_splits(
         train,
@@ -97,10 +125,36 @@ def main() -> None:
         test,
     )
 
-    print(f"Total rows: {len(df)}")
-    print(f"Training rows: {len(train)}")
-    print(f"Validation rows: {len(validation)}")
-    print(f"Test rows: {len(test)}")
+    print(
+        f"Total rows: {len(df)}"
+    )
+
+    print(
+        f"Training rows: {len(train)}"
+    )
+
+    print(
+        f"Validation rows: {len(validation)}"
+    )
+
+    print(
+        f"Test rows: {len(test)}"
+    )
+
+    print(
+        f"\nTraining journeys: "
+        f"{train['journey_id'].nunique()}"
+    )
+
+    print(
+        f"Validation journeys: "
+        f"{validation['journey_id'].nunique()}"
+    )
+
+    print(
+        f"Test journeys: "
+        f"{test['journey_id'].nunique()}"
+    )
 
     print("\nTraining period:")
     print(train["observed_at"].min())
